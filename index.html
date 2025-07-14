@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Portfolio – Bullwhip Case Study</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link href="https://fonts.googleapis.com/css2?family=Josefin+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    body{background:#313a8a;color:#fff;font-family:'Josefin Sans',Arial,sans-serif;margin:0;padding:0;min-height:100vh}
+    .container{max-width:600px;margin:40px auto;padding:0 10px}
+    .header{font-size:1.8em;letter-spacing:1px;margin:20px 0 48px}
+    details{margin-bottom:32px;border-left:4px solid #f3f3f3;padding-left:18px}
+    summary{font-size:1.3em;font-weight:700;cursor:pointer;list-style:none;position:relative}
+    summary::-webkit-details-marker{display:none}
+    summary:before{content:"▶";display:inline-block;margin-right:8px;transition:transform .2s ease}
+    details[open] summary:before{transform:rotate(90deg)}
+    summary .teaser{display:block;font-size:.9em;font-weight:400;color:#cfd4ff;margin:4px 0 0 26px;line-height:1.4}
+    details[open] summary .teaser{display:none}
+    .section-body{font-size:1em;line-height:1.7;color:#eaeaea;margin-top:12px}
+    .visual-placeholder{width:100%;height:180px;background:#4c55aa;color:#bfc5ff;display:flex;align-items:center;justify-content:center;border-radius:6px;margin:18px 0;font-size:.9em;font-style:italic;text-align:center;padding:6px}
+    
+    /* Enhanced Code block with proper scrolling */
+    .code-block{
+      background:#1d254f;
+      color:#eaeaea;
+      padding:15px 15px 25px;
+      border-radius:8px;
+      font-family:"Courier New",monospace;
+      font-size:.9em;
+      margin:18px 0;
+      max-height:220px;
+      overflow-y:auto;
+      overflow-x:auto;
+      position:relative;
+      white-space:pre;
+    }
+    
+    .code-block.expanded{
+      max-height:none;
+    }
+    
+    .expand-btn{
+      position:absolute;
+      top:8px;
+      right:8px;
+      background:rgba(29, 37, 79, 0.9);
+      border:1px solid #bfc5ff;
+      color:#bfc5ff;
+      border-radius:3px;
+      font-size:.7em;
+      cursor:pointer;
+      padding:2px 6px;
+      z-index:1;
+    }
+    
+    .expand-btn:hover{
+      background:#4c55aa;
+    }
+    
+    .code-block::-webkit-scrollbar {
+      width: 8px;
+    }
+    
+    .code-block::-webkit-scrollbar-track {
+      background: rgba(76, 85, 170, 0.3);
+      border-radius: 4px;
+    }
+    
+    .code-block::-webkit-scrollbar-thumb {
+      background: #bfc5ff;
+      border-radius: 4px;
+    }
+    
+    .code-block::-webkit-scrollbar-thumb:hover {
+      background: #cfd4ff;
+    }
+
+    /* NEW: Image Modal Styles */
+    .expandable-image {
+      cursor: zoom-in;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      width: 100%;
+      border-radius: 6px;
+      margin: 18px 0;
+    }
+
+    .expandable-image:hover {
+      transform: scale(1.02);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+
+    .image-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.8);
+      backdrop-filter: blur(5px);
+      z-index: 1000;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .image-modal.active {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-content {
+      position: relative;
+      max-width: 90%;
+      max-height: 90%;
+      animation: zoomIn 0.3s ease;
+    }
+
+    .modal-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 10px 50px rgba(0, 0, 0, 0.5);
+    }
+
+    .close-btn {
+      position: absolute;
+      top: -40px;
+      right: 0;
+      background: rgba(255, 255, 255, 0.9);
+      color: #333;
+      border: none;
+      width: 35px;
+      height: 35px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      z-index: 1001;
+    }
+
+    .close-btn:hover {
+      background: #fff;
+      transform: scale(1.1);
+    }
+
+    .image-caption {
+      position: absolute;
+      bottom: -50px;
+      left: 0;
+      right: 0;
+      color: #fff;
+      text-align: center;
+      font-size: 0.9em;
+      background: rgba(0, 0, 0, 0.7);
+      padding: 10px;
+      border-radius: 4px;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes zoomIn {
+      from { 
+        opacity: 0; 
+        transform: scale(0.5);
+      }
+      to { 
+        opacity: 1; 
+        transform: scale(1);
+      }
+    }
+
+    /* Mobile responsiveness for modal */
+    @media (max-width: 768px) {
+      .close-btn {
+        top: -30px;
+        right: 10px;
+        width: 30px;
+        height: 30px;
+        font-size: 16px;
+      }
+      
+      .image-caption {
+        bottom: -40px;
+        font-size: 0.8em;
+        padding: 8px;
+      }
+    }
+    
+    @media(max-width:700px){.container{max-width:98vw;margin:20px 1vw}}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">Portfolio Project - BullWhip Intelligence Platform</div>
+
+    <!-- Image Modal -->
+    <div class="image-modal" id="imageModal">
+      <div class="modal-content">
+        <button class="close-btn" onclick="closeModal()">&times;</button>
+        <img class="modal-image" id="modalImage" src="" alt="">
+        <div class="image-caption" id="modalCaption"></div>
+      </div>
+    </div>
+
+    <!-- 1 -->
+    <details>
+      <summary>1. Overview &amp; Use Case <span class="teaser">Helping logistics companies target the right prospects with data, not gut feeling</span></summary>
+      <div class="section-body">
+        <p><strong>Helping Logistics Companies Target the Right Prospects with Data, Not Gut Feeling</strong></p>
+        <p>While working as an analyst at a logistics company, I recognized a significant inefficiency in their sales prospecting process—time-consuming searches for potential leads resulted in low outreach productivity. To address this, I initially designed a rudimentary database filtering UK businesses by industry, location, and commodities shipped. Seeing its positive impact, I envisioned a comprehensive solution.</p>
+        <p>Thus, Bullwhip was born, a platform leveraging extensive logistics data, machine learning, real-time data manipulation, APIs, and LLMs. The system streamlines the entire process from identifying prospects to executing outreach, dramatically enhancing efficiency and profitability for logistics companies.</p>
+        <img src="images\[Card[Flowchart – traditional vs. Bullwhip prospecting]trans.png" alt="Flowchart – traditional vs. Bullwhip prospecting" class="expandable-image">
+        <p>Refer to diagram <strong>7.a ⤵</strong> for platform UI</p>
+      </div>
+    </details>
+
+    <!-- 2 -->
+    <details>
+      <summary>2. Data Processing &amp; Business Metrics <span class="teaser">Turning disparate public datasets into insight‑ready features</span></summary>
+      <div class="section-body">
+        <p><strong>Turning Disparate Public Datasets into Insight-Ready Features</strong></p>
+        <p>To build a tool that could intelligently recommend logistics leads, I first needed to understand what kinds of data could inform those decisions. I started with a list of UK companies and layered in multiple types of data to enrich and rank them.</p>
+        <p>I categorize our inputs into three groups:</p>
+        <ul>
+          <li><strong>Core Company Data:</strong> Names, registration numbers, SIC codes — the foundation</li>
+          <li><strong>Enrichment Data:</strong> Company location, industry, commodity codes, accounts, import/export status</li>
+          <li><strong>Functional Data:</strong> ADR &amp; dangerous goods, temperature sensitivity, company size, trade direction and seasonality</li>
+        </ul>
+        <p>The challenge: different datasets use different identifiers and formats. I had to normalize millions of records using a combination of fuzzy matching, cross-source logic, and lookups — reconciling companies from commodity datasets, accounts filings, and trade reports into a unified view.</p>
+        <p>This processing pipeline created the basis for custom metrics like:</p>
+        <ul>
+          <li><strong>ADR/Temp Score:</strong> likelihood of handling certain controlled goods</li>
+          <li><strong>Seasonality Index:</strong> month-weighted shipping volumes</li>
+          <li><strong>Import/Export Regions:</strong> derived from aggregated customs data</li>
+          <li><strong>Size Index:</strong> based on revenue, employees, and assets</li>
+      </ul>        
+        <img src="images\[Cards – Need refrigerated ➜ Data source mapping]trans.png" alt="Need refrigerated? ➜ Data source mapping" class="expandable-image">        
+        <p>A highlight was: building a parser that extracted structured financial info from over 3 million XHTML-format UK accounts filings. I developed a logic tree to extract employee count, turnover, and balance sheet items, then fallback-enriched ~30% of missing data using LLMs and APIs.</p>
+        <ul>
+        <div class="code-block"><button class="expand-btn" title="Expand / Collapse">Expand</button># Parse XHTML UK company accounts to extract financial metrics
+from lxml import etree
+
+def extract_accounts(file_path):
+    content = open(file_path, 'rb').read()
+    doc = etree.XML(content)
+    ns = {k: v for k, v in doc.nsmap.items() if k}
+
+    prefix = next((p for p, url in ns.items() if "fr" in url and "core" in url), None)
+    if not prefix:
+        return []
+
+    rows = []
+    for el in doc.xpath(f"//*[starts-with(@name, '{prefix}:')]", namespaces=ns):
+        value = el.text.strip() if el.text else None
+        if not value: continue
+
+        rows.append({
+            "AccountCategory": el.get("name").split(":")[1],
+            "Value": value
+        })
+    return rows
+        </div>
+      </div>
+    </details>
+
+    <!-- 3 -->
+    <details>
+      <summary>3. Database Design &amp; Architecture <span class="teaser">From Whiteboard to Scalable SQL: Structuring a Multi-Source Intelligence Engine</span></summary>
+      <div class="section-body">
+        <p><strong>From Whiteboard to Scalable SQL: Structuring a Multi-Source Intelligence Engine</strong></p>
+        <p>Effective data architecture underpins Bullwhip's performance. Using Azure SQL, I structured a schema aligned with platform needs — defining clear relationships across core entities like companies, shipments, financials, and API payloads. I designed it to support efficient Power BI modeling while enabling modular enrichment and automation pipelines.</p>
+        <ul>
+          <li><strong>Separation of Concerns:</strong> Distinct tables for core company info, shipment records, contact data, enrichment events, and financials</li>
+          <li><strong>Indexing for Speed:</strong> Composite indexes on key lookup dimensions (e.g., postcode + SIC code)</li>
+          <li><strong>Flexible Extensibility:</strong> Staging tables for API payloads and webhook logs, allowing new data sources to be onboarded quickly</li>
+          <li><strong>Security-Aware:</strong> All write operations gated behind controlled Azure Functions, with user-level isolation for sensitive actions</li>
+        </ul>
+        <p>Visualizing data interactions early — through whiteboarding and Power BI schema mapping — helped define table roles and relationships. This enabled consistent, accurate querying across DirectQuery and imported modes, even as data volumes grew and more APIs were integrated.</p>        
+        <img src="images\whiteboard.png" alt="Database design whiteboard" class="expandable-image">
+        <p>This architecture supports the frontend Power BI platform in executing complex, dynamic filters (e.g., "show me temp-controlled logistics companies in the Midlands with exports to West Africa") using a mix of DirectQuery and in-memory tables — while maintaining a clean audit trail and consistent logic across the stack.</p>        
+        <img src="images\databaseschemablock.png" alt="Database ERD schema diagram" class="expandable-image">        
+      </div>
+    </details>
+
+    <!-- 4 -->
+    <details>
+      <summary>4. External Data &amp; Enrichment APIs <span class="teaser">Connecting the dots with public data and real‑time enrichment</span></summary>
+      <div class="section-body">
+        <p><strong>Connecting the Dots with Public Data and Real‑Time Enrichment</strong></p>
+        <p><strong>Feed APIs –</strong> Used to populate initial database content (Companies House financial data, regional trade statistics, commodity codes).</p>
+        <ul>
+          <li><strong>Companies House API –</strong> for company metadata, financial filings (PDF/XHTML), director info</li>
+          <li><strong>HMRC &amp; UK Trade Info –</strong> import/export classifications, regional trade stats, commodity code libraries</li>          
+          <li><strong>Open data sets –</strong> industry mappings, temp/dangerous goods indicators</li>          
+        </ul>
+        <p>Refer to diagram <strong>2.a ⤴</strong></p>
+        <p><strong>Stream APIs –</strong> Active during platform usage for real-time data enrichment (Personnel Broker API's for personnel and company data enrichment, Companies House for financial updates, OpenAI's GPT for summarizing company profiles).</p>
+        <ul>
+          <li><strong>Personnel API's –</strong> for contact enrichment (pulling emails, titles, LinkedIn links)</li>
+          <li><strong>Companies House –</strong> for live company enrichment (Directors)</li>          
+          <li><strong>ChatGPT APIs –</strong> LLM-based analysis for live company summaries based on user selected prompts</li>          
+        </ul>
+        <img src="images\[Cards - StreamAPI]NEW.png" alt="Stream API architecture flowchart" class="expandable-image">
+        </ul>
+        <div class="code-block"><button class="expand-btn">Expand</button># Azure Function – Personnel Discovery Pipeline
+import azure.functions as func
+import asyncio, aiohttp, json
+from openai import OpenAI
+from bs4 import BeautifulSoup
+
+app = func.FunctionApp(http_auth_level=func.AuthLevel.FUNCTION)
+
+SENIOR = {"director", "manager", "chief", "head"}
+FUNCTION = {"supply", "logistics", "procurement", "operations"}
+
+def rank(person):
+    """Score based on role relevance, seniority, and email validity"""
+    title = person.get("title", "").lower()
+    return (
+        4 * any(w in title for w in FUNCTION) +
+        2 * any(w in title for w in SENIOR) +
+        1 * (person.get("email_status") == "verified")
+    )
+
+async def search_contacts(domains, titles=None):
+    params = {"location": "uk", "per_page": "100"}
+    for domain in domains:
+        params["company_domain"] = domain
+    if titles:
+        params["job_titles"] = titles
+    async with aiohttp.ClientSession() as s:
+        async with s.post(CONTACT_API_ENDPOINT, headers=auth_headers, params=params) as r:
+            return (await r.json()).get("contacts", []) if r.status == 200 else []
+
+async def fetch_directors(company_number):
+    url = f"{REGISTRY_ENDPOINT}/{company_number}/officers"
+    async with aiohttp.ClientSession(auth=registry_auth) as s:
+        async with s.get(url) as r:
+            data = await r.json() if r.status == 200 else {}
+            return [
+                {"name": o["name"], "title": o.get("occupation", "Director")}
+                for o in data.get("items", []) if not o.get("resigned_on")
+            ]
+
+async def scrape_and_summarize(domain, company_name):
+    try:
+        async with aiohttp.ClientSession() as s:
+            async with s.get(f"https://{domain}", timeout=10) as r:
+                soup = BeautifulSoup(await r.text(), "html.parser")
+                for tag in soup(["script", "style", "nav", "footer"]): tag.decompose()
+                content = soup.get_text(strip=True)[:2000]
+    except:
+        return ""
+    
+    prompt = f"""Company: {company_name}
+Website Data: {content}
+Task: Summarise business (2-3 lines) focusing on services, market and uniqueness."""
+    
+    try:
+        client = OpenAI(api_key=openai_key)
+        res = await asyncio.to_thread(
+            lambda: client.chat.completions.create(
+                model="gpt-4-mini",
+                messages=[{"role": "user", "content": prompt}],
+                temperature=0.3
+            )
+        )
+        return res.choices[0].message.content.strip()
+    except:
+        return ""
+
+def persist(company, people):
+    # Persist top contacts to SQL; upload top 3 to Blob for enrichment UI
+    save_to_sql(company, people[:10])
+    save_to_blob(company["number"], people[:3])
+
+async def process(companies):
+    results = []
+    for company in companies:
+        domains = company.get("domains", [])
+        contacts = await search_contacts(domains, list(FUNCTION))
+        if len(contacts) < 3:
+            contacts += await search_contacts(domains)
+        contacts += await fetch_directors(company["company_number"])
+
+        for p in contacts:
+            p["rank"] = rank(p)
+        ranked = sorted({p["email"]: p for p in contacts if p.get("email")}.values(), key=lambda x: -x["rank"])
+
+        description = await scrape_and_summarize(domains[0], company["name"]) if domains else ""
+        persist(company, ranked)
+
+        results.append({
+            "company_number": company["company_number"],
+            "primary_domain": domains[0] if domains else "",
+            "summary": description,
+            "contacts": ranked[:5]
+        })
+    return results
+
+@app.route(route="personnel_discovery", methods=["POST"])
+def personnel_entry(req: func.HttpRequest) -> func.HttpResponse:
+    try:
+        payload = req.get_json()
+        companies = payload.get("companies", [])
+        if not companies:
+            return func.HttpResponse(json.dumps({"error": "No companies provided"}), status_code=400)
+
+        loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
+        try:
+            result = loop.run_until_complete(process(companies))
+            return func.HttpResponse(json.dumps({"results": result}), status_code=200)
+        finally:
+            loop.close()
+    except Exception as e:
+        return func.HttpResponse(json.dumps({"error": str(e)}), status_code=500)
+        </div>
+        <p><strong>Bespoke APIs –</strong> Google APIs for automated marketing tools and specialized data scraping for international markets.</p>
+        <ul>
+          <li><strong>Custom Azure Web API –</strong> built to serve the LeadMe mini-app (Embedded questionnaire that uses a Function App to generate and email a custom PDF of suggested companies based on a user's preferences) on our website</li>
+          <li><strong>Geolocation scraping –</strong> in under-documented regions (like African logistics hubs), I use Google's API and spatial algorithms to find businesses by inferred location and type</li>          
+        </ul>
+        </ul>
+        <div class="code-block"><button class="expand-btn">Expand</button># Google Places Grid Crawler – Adaptive Discovery Pipeline
+import os, json, math, requests
+from datetime import datetime
+from dotenv import load_dotenv
+
+def get_step(lat, radius_m):
+    """Calculate degree steps based on meters"""
+    return radius_m / 111000, radius_m / (111000 * math.cos(math.radians(lat)))
+
+def request_places(session, payload):
+    """Call external business discovery API with retry and backoff"""
+    url = "https://<external-api>/searchNearby"
+    for backoff in [1, 2, 4, 8, 16]:
+        try:
+            r = session.post(url, json=payload, timeout=10)
+            if r.status_code == 200: return r.json()
+            if r.status_code == 429: time.sleep(backoff)
+        except: time.sleep(backoff)
+    return {}
+
+def search_tile(lat, lng, radius_m, depth, cfg, session, seen, results):
+    """Recursive tile crawler"""
+    if depth >= cfg["max_depth"]: return
+    payload = {
+        "includedTypes": cfg["types"],
+        "maxResultCount": 20,
+        "locationRestriction": {
+            "circle": {"center": {"latitude": lat, "longitude": lng}, "radius": radius_m}
+        },
+    }
+    data = request_places(session, payload)
+    for place in data.get("places", []):
+        pid = place.get("id")
+        if pid and pid not in seen:
+            seen.add(pid)
+            results.append(place)
+
+    if len(data.get("places", [])) >= 20 and radius_m > cfg["min_radius"]:
+        lat_step, lng_step = get_step(lat, radius_m / 2)
+        for dlat in (-lat_step, lat_step):
+            for dlng in (-lng_step, lng_step):
+                search_tile(lat + dlat, lng + dlng, radius_m // 2, depth + 1, cfg, session, seen, results)
+
+def export(results, cfg):
+    """Export results as JSON"""
+    ts = datetime.now().strftime("%Y%m%d_%H%M%S")
+    path = f"{cfg['output_dir']}/places_{ts}.json"
+    os.makedirs(cfg["output_dir"], exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump({"total": len(results), "places": results}, f, indent=2)
+    print(f"Exported {len(results)} places → {path}")
+
+def main():
+    """Run adaptive crawl from .env parameters"""
+    load_dotenv()
+    cfg = {
+        "api_key": os.getenv("GOOGLE_API_KEY"),
+        "center_lat": float(os.getenv("CENTER_LAT", -17.8292)),
+        "center_lng": float(os.getenv("CENTER_LNG", 31.0522)),
+        "initial_radius": int(os.getenv("INITIAL_RADIUS_M", 3000)),
+        "min_radius": int(os.getenv("MIN_RADIUS_M", 750)),
+        "max_depth": int(os.getenv("MAX_DEPTH", 7)),
+        "types": os.getenv("PLACE_TYPES", "courier_service,truck_stop").split(","),
+        "output_dir": os.getenv("OUTPUT_DIR", "truck/testresults")
+    }
+
+    seen, results = set(), []
+    with requests.Session() as session:
+        session.headers.update({
+            "Content-Type": "application/json",
+            "X-API-Key": cfg["api_key"],
+            "X-FieldMask": "<relevant fields>"
+        })
+        search_tile(cfg["center_lat"], cfg["center_lng"], cfg["initial_radius"], 0, cfg, session, seen, results)
+
+    export(results, cfg)
+
+if __name__ == "__main__":
+    main()
+      </div>
+    </details>
+
+    <!-- 5 -->
+    <details>
+      <summary>5. Predictive Targeting Model <span class="teaser">Learning what a profitable customer looks like — then finding more like them</span></summary>
+      <div class="section-body">
+        <p><strong>Learning What a Profitable Customer Looks Like</strong></p>
+        <p>One of Bullwhip's most forward-thinking features is its evolving ML model that ranks companies based on expected profitability — using a firm's public data to predict whether they're a high-value prospect for a specific freight client.</p>
+        <h4>1. Link Internal Performance to Public Attributes</h4>
+        <p>I start by matching each company in a client's shipment ledger to its public profile:</p>
+        <ul>
+          <li>Registered postcode</li>
+          <li>Industry (SIC/HS codes)</li>
+          <li>Size indicators (revenue, employees)</li>
+          <li>Historical calendar patterns (seasonality, delays)</li>
+        </ul>
+        <p>I then use the profit from those shipments as the supervised target. The model learns patterns in which companies tend to yield higher profit margins.</p>
+        <h4>2. Train & Interpret the Model</h4>    
+        <p>I engineer the features and fit a LightGBM classifier — chosen for its speed and ability to handle categorical + numeric inputs. I validate using time-split cross-validation and interpret feature importance using SHAP values.</p>    
+        <img src="images\SHAPDummy.png" alt="SHAP feature importance visualization" class="expandable-image">
+        <h4>3. Score the Wider Universe</h4>
+        <p>Once trained, the model is applied to every eligible company in our universe:</p>
+        <ul>
+          <li>Same public data → score → rank</li>
+          <li>Top decile shown as "Most Likely to Be Profitable"</li>
+        </ul>
+        <p>I present this via a ranked table inside the Bullwhip platform, complete with a "confidence badge" and filters to adjust thresholds.</p>
+        <img src="images\ScoringDistDummy.png" alt="ML model scoring distribution visualization" class="expandable-image">
+      </div>
+    </details>
+
+    <!-- 6 -->
+    <details>
+      <summary>6. Automation &amp; Scalable Infrastructure <span class="teaser">A Power BI platform that feels like a web app</span></summary>
+      <div class="section-body">
+        <p><strong>A Power BI Platform That Feels Like a Web App</strong></p>
+        <p>To bridge the gap between frontend UI and backend processes — and to avoid building a full web app early on — I developed a system of Function Apps and automation triggers that turn the Bullwhip dashboard into a living, reactive tool.</p>
+        <h4>Each function:</h4>
+        <ul>
+          <li>Logs the action in Blob Storage</li>
+          <li>Runs its task (e.g. contact enrichment, similarity match, LLM prompt generation)</li>
+          <li>Posts a status update blob</li>
+          <li>Triggers a visual refresh or progress message in Power BI</li>
+        </ul>
+        <img src="images\[visual embedded] [Button Click] → [Power Automate] → [Azure Function] → [Blob Log] → [Refresh Signal] → [Power BI Update].png" alt="Automation flow architecture diagram" class="expandable-image">
+        <h4>User actions in the Power BI interface</h4>
+        <ul>
+          <li><strong>Log Company —</strong> marks a company as contacted</li>
+          <li><strong>Add to List —</strong> links a company to a saved list, enriches with contact &amp; company data</li>
+          <li><strong>Find Similar —</strong> runs a fuzzy match &amp; ML scoring to auto-append ~30 lookalikes</li>
+          <li><strong>Generate Outreach Angle —</strong> uses ChatGPT to craft tailored email/call copy</li>
+        </ul>
+        <div class="code-block"><button class="expand-btn">Expand</button># Azure Function – Flow Router + Batch Processor
+import azure.functions as func
+import asyncio, time, json, math, logging, requests
+import pandas as pd
+from sqlalchemy import create_engine
+
+@app.route(route="Terminal", methods=["POST"])
+def handle_request(req: func.HttpRequest) -> func.HttpResponse:
+    """Terminal function routing incoming payloads to matching processors"""
+    payload = req.get_json()
+    flow = payload.get("flow")
+
+    if flow == "Standard_Split":
+        return func.HttpResponse(json.dumps(process_standard_split_flow(payload)), status_code=200)
+    elif flow == "Similar_Flow_Neutral":
+        return func.HttpResponse(json.dumps(process_similar_flow(payload)), status_code=200)
+    else:
+        return func.HttpResponse(json.dumps({"error": f"Unsupported flow '{flow}'"}), status_code=400)
+
+def process_standard_split_flow(payload):
+    """Splits incoming company list into batches and distributes between two apps"""
+    companies = payload.get("Power BI values", [])
+    batches = [companies[i:i+5] for i in range(0, len(companies), 5)]
+    midpoint = len(batches) // 2
+    results = []
+
+    for idx, (target_batches, app_name) in enumerate([(batches[:midpoint], "add2list"), (batches[midpoint:], "add2list2")]):
+        for i, batch in enumerate(target_batches):
+            try:
+                res = requests.post(f"https://<function-app-{idx+1}>", json={"Power BI values": batch}, timeout=10)
+                results.append({"batch": i+1, "app": app_name, "status": res.status_code})
+            except Exception as e:
+                results.append({"batch": i+1, "app": app_name, "error": str(e)})
+            time.sleep(1)  # Prevent overload
+
+    return {"status": "complete", "batches": len(batches), "results": results}
+
+def process_similar_flow(payload):
+    """Finds similar companies from SQL, splits results, and distributes to function apps"""
+    companies = payload.get("Power BI values", [])
+    input_number = companies[0]["CompanyNumber"]
+
+    # Connect to DB and query similar matches
+    engine = create_engine("mssql+pyodbc://<conn_string>")
+    simref = pd.read_sql(f"SELECT SimRef FROM SimilarMatcher WHERE CompanyNumber = '{input_number}'", engine).iloc[0]["SimRef"]
+    matches = pd.read_sql(f"SELECT * FROM SimilarMatcher WHERE SimRef = '{simref}' ORDER BY Pwr DESC", engine).head(30)
+
+    enriched = [{
+        "CompanyNumber": row["CompanyNumber"],
+        "Name": row["Name"],
+        "Average of list": companies[0]["Average of list"],
+        "Average of UserID": companies[0]["Average of UserID"]
+    } for _, row in matches.iterrows()]
+
+    # Distribute to two apps in 5-record batches
+    mid = len(enriched) // 2
+    halves = [enriched[:mid], enriched[mid:]]
+    results = []
+
+    for idx, half in enumerate(halves):
+        for i in range(0, len(half), 5):
+            batch = half[i:i+5]
+            try:
+                res = requests.post(f"https://<function-app-{idx+1}>", json={"Power BI values": batch}, timeout=10)
+                results.append({"batch": i//5+1, "app": f"add2list{idx+1}", "status": res.status_code})
+            except Exception as e:
+                results.append({"batch": i//5+1, "app": f"add2list{idx+1}", "error": str(e)})
+            time.sleep(1)
+
+    return {"status": "success", "records_sent": len(enriched), "results": results}
+          </div>
+        <p>All async, retry-enabled, and designed for failure tolerance and visibility — users see if a flow failed and why.</p>
+      </div>
+    </details>
+
+    <!-- 7 -->
+    <details>
+      <summary>7. Visualization &amp; UX <span class="teaser">Minimal, fast, and built for focused prospecting</span></summary>
+      <div class="section-body">
+        <p><strong>Minimal, Fast, and Built for Focused Prospecting</strong></p>
+        <p>Bullwhip's user interface, developed in Power BI, emphasizes minimalism and clarity. Collaborating with industry experts, I structured intuitive visual hierarchies: filters are prominent yet unobtrusive, and critical data visuals are centrally positioned for immediate insight.</p>
+        <h4>Design Language</h4>
+        <ul>
+          <li><strong>Left-Aligned Filter Panel —</strong> Simple filters (region, industry, size) are always visible — no clutter, no dropdown traps</li>
+          <li><strong>Expandable Lead Table —</strong> Focused default view, with deep-dive available on click</li>
+          <li><strong>Side-by-Side Commodity & Trade Visuals —</strong> See what a company ships and where, at a glance</li>
+          <li><strong>Info Cards with Icons —</strong> Bold, simple visuals for size, danger rating, temperature need</li>
+          <li><strong>Request Actions on Their Own Island —</strong> All buttons (like "Generate Email") are isolated to reduce friction and prevent confusion</li>
+        </ul>
+        <img src="images\[Full‑platform screenshot].gif" alt="Full platform UI screenshot" class="expandable-image">
+        <h4>What I Learned</h4>
+        <ul>
+          <li><strong></strong>Spatial hierarchy guides narrative</li>
+          <li><strong></strong>Buttons reduce hesitation</li>
+          <li><strong></strong>Minimal defaults prevent overwhelm</li>
+        </ul>
+      </div>
+    </details>
+
+  </div>
+
+  <script>
+    // Toggle expansion of code blocks
+    document.addEventListener('DOMContentLoaded', () => {
+      document.querySelectorAll('.code-block .expand-btn').forEach(btn => {
+        btn.addEventListener('click', e => {
+          const block = e.target.closest('.code-block');
+          block.classList.toggle('expanded');
+          btn.textContent = block.classList.contains('expanded') ? 'Collapse' : 'Expand';
+        });
+      });
+
+      // NEW: Image modal functionality
+      document.querySelectorAll('.expandable-image').forEach(img => {
+        img.addEventListener('click', () => openModal(img));
+      });
+
+      // Close modal when clicking outside the image
+      document.getElementById('imageModal').addEventListener('click', (e) => {
+        if (e.target === e.currentTarget) {
+          closeModal();
+        }
+      });
+
+      // Close modal with Escape key
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          closeModal();
+        }
+      });
+    });
+
+    function openModal(img) {
+      const modal = document.getElementById('imageModal');
+      const modalImg = document.getElementById('modalImage');
+      const caption = document.getElementById('modalCaption');
+      
+      modal.classList.add('active');
+      modalImg.src = img.src;
+      caption.textContent = img.alt;
+      
+      // Prevent body scrolling when modal is open
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('imageModal');
+      modal.classList.remove('active');
+      
+      // Restore body scrolling
+      document.body.style.overflow = 'auto';
+    }
+  </script>
+</body>
+</html>
