@@ -306,7 +306,7 @@ def extract_accounts(file_path):
         <ul>
           <li><strong>Personnel API's –</strong> for contact enrichment (pulling emails, titles, LinkedIn links)</li>
           <li><strong>Companies House –</strong> for live company enrichment (Directors)</li>          
-          <li><strong>ChatGPT APIs –</strong> LLM-based analysis for live company summaries based on user selected prompts</li>          
+          <li><strong>GPT APIs –</strong> LLM-based analysis for live company summaries based on user selected prompts</li>          
         </ul>
         <img src="images\[Cards - StreamAPI]NEW.png" alt="Stream API architecture flowchart" class="expandable-image">
         </ul>
@@ -514,7 +514,7 @@ if __name__ == "__main__":
 
     <!-- 5 -->
     <details>
-      <summary>5. Predictive Targeting Model <span class="teaser">Learning what a profitable customer looks like — then finding more like them</span></summary>
+      <summary>5. ML Predictive Targeting Model <span class="teaser">Building a Machine Learnign Model to learn what a profitable customer looks like — then finding more like them</span></summary>
       <div class="section-body">
         <p><strong>Learning What a Profitable Customer Looks Like</strong></p>
         <p>One of Bullwhip's most forward-thinking features is its evolving ML model that ranks companies based on expected profitability — using a firm's public data to predict whether they're a high-value prospect for a specific freight client.</p>
@@ -560,7 +560,7 @@ if __name__ == "__main__":
           <li><strong>Log Company —</strong> marks a company as contacted</li>
           <li><strong>Add to List —</strong> links a company to a saved list, enriches with contact &amp; company data</li>
           <li><strong>Find Similar —</strong> runs a fuzzy match &amp; ML scoring to auto-append ~30 lookalikes</li>
-          <li><strong>Generate Outreach Angle —</strong> uses ChatGPT to craft tailored email/call copy</li>
+          <li><strong>Generate Outreach Angle —</strong> uses GPT to craft tailored email/call copy</li>
         </ul>
         <div class="code-block"><button class="expand-btn">Expand</button># Azure Function – Flow Router + Batch Processor
 import azure.functions as func
